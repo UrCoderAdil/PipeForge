@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+
+  pipelines Pipeline[]
+}
+
+model Pipeline {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  provider    String   @default("AWS")
+  status      String   @default("idle")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+
+  stages     Stage[]
+  executions Execution[]
+}
+
+model Stage {
+  id         String @id @default(uuid())
+  name       String
+  type       String
+  orderIndex Int
+  config     Json   @default("{}")
+  decorators Json?  @default("[]")
+
+  pipelineId String
+  pipeline   Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+}
+
+model Execution {
+  id         String    @id @default(uuid())
+  status     String    @default("pending")
+  duration   Int?
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+  logs       Json      @default("[]")
+  provider   String    @default("AWS")
+  forceFail  Boolean   @default(false)
+  failStage  String?
+
+  pipelineId String
+  pipeline   Pipeline @relation(fields: [pipelineId], references: [id])
+}
+
+model Plugin {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  category    String   @default("notification")
+  enabled     Boolean  @default(false)
+  config      Json?    @default("{}")
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
