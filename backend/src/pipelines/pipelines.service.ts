@@ -1,4 +1,4 @@
-﻿import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePipelineDto } from './dto/create-pipeline.dto';
 import { PipelineDirector } from './builders/pipeline.director';
@@ -103,6 +103,9 @@ export class PipelinesService {
       case 'docker': config = PipelineDirector.buildDockerServicePipeline('Docker Service Pipeline'); break;
       case 'fullqa': config = PipelineDirector.buildFullQAPipeline('Full QA Pipeline'); break;
       case 'quickdeploy': config = PipelineDirector.buildQuickDeployPipeline('Quick Deploy Pipeline'); break;
+      case 'mltraining': config = PipelineDirector.buildMLTrainingPipeline('ML Training Pipeline'); break;
+      case 'mldeploy': config = PipelineDirector.buildMLDeployPipeline('ML Deploy Pipeline'); break;
+      case 'fullmlops': config = PipelineDirector.buildFullMLOpsPipeline('Full MLOps Pipeline'); break;
       default: throw new NotFoundException('Template not found');
     }
 

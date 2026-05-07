@@ -1,4 +1,4 @@
-﻿import { PipelineBuilder, PipelineConfig } from './pipeline.builder';
+import { PipelineBuilder, PipelineConfig } from './pipeline.builder';
 
 export class PipelineDirector {
   static buildNodeAppPipeline(name: string): PipelineConfig {
@@ -43,6 +43,48 @@ export class PipelineDirector {
       .setDescription('Quick deploy without full test suite')
       .addBuildStage()
       .addDeployStage()
+      .build();
+  }
+
+  static buildMLTrainingPipeline(name: string): PipelineConfig {
+    return new PipelineBuilder()
+      .setName(name)
+      .setProvider('AWS')
+      .setDescription('End-to-end ML training pipeline: validate → engineer → train → evaluate → register')
+      .addDataValidationStage()
+      .addFeatureEngineeringStage()
+      .addModelTrainingStage()
+      .addModelEvaluationStage()
+      .addModelRegistrationStage()
+      .build();
+  }
+
+  static buildMLDeployPipeline(name: string): PipelineConfig {
+    return new PipelineBuilder()
+      .setName(name)
+      .setProvider('AWS')
+      .setDescription('ML model deployment with canary release and drift monitoring')
+      .addSecurityScan()
+      .addCanaryDeployStage()
+      .addMonitorStage()
+      .addDriftCheckStage()
+      .build();
+  }
+
+  static buildFullMLOpsPipeline(name: string): PipelineConfig {
+    return new PipelineBuilder()
+      .setName(name)
+      .setProvider('AWS')
+      .setDescription('Full MLOps pipeline: data → features → train → evaluate → register → canary → monitor → drift')
+      .addDataValidationStage()
+      .addFeatureEngineeringStage()
+      .addModelTrainingStage()
+      .addModelEvaluationStage()
+      .addModelRegistrationStage()
+      .addSecurityScan()
+      .addCanaryDeployStage()
+      .addMonitorStage()
+      .addDriftCheckStage()
       .build();
   }
 }

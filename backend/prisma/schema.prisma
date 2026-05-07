@@ -79,3 +79,72 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+model Experiment {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  status      String    @default("running")
+  modelType   String    @default("xgboost")
+  metrics     Json      @default("{}")
+  params      Json      @default("{}")
+  tags        Json      @default("[]")
+  duration    Int?
+  pipelineId  String?
+  createdAt   DateTime  @default(now())
+  finishedAt  DateTime?
+}
+
+model ModelVersion {
+  id           String    @id @default(uuid())
+  name         String
+  version      Int
+  stage        String    @default("staging")
+  framework    String    @default("xgboost")
+  metrics      Json      @default("{}")
+  artifactPath String?
+  description  String?
+  experimentId String?
+  createdAt    DateTime  @default(now())
+  promotedAt   DateTime?
+}
+
+model DataValidationRun {
+  id           String   @id @default(uuid())
+  datasetName  String
+  status       String   @default("passed")
+  rowCount     Int      @default(0)
+  checksPassed Int      @default(0)
+  checksFailed Int      @default(0)
+  results      Json     @default("[]")
+  pipelineId   String?
+  createdAt    DateTime @default(now())
+}
+
+model DriftAlert {
+  id          String    @id @default(uuid())
+  alertType   String    @default("data")
+  severity    String    @default("medium")
+  feature     String?
+  psiScore    Float     @default(0)
+  threshold   Float     @default(0.2)
+  status      String    @default("open")
+  modelName   String?
+  description String?
+  autoRetrain Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+}
+
+model Feature {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  entity      String
+  valueType   String   @default("float")
+  description String?
+  source      String?
+  tags        Json     @default("[]")
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

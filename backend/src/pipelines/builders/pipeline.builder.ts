@@ -1,4 +1,4 @@
-﻿export interface StageConfig {
+export interface StageConfig {
   name: string;
   type: string;
   orderIndex: number;
@@ -87,6 +87,83 @@ export class PipelineBuilder {
       orderIndex: this.stageIndex++,
       config: config || { url: '/health', retries: 3 },
       decorators: ['logging'],
+    });
+    return this;
+  }
+
+  addDataValidationStage(config?: Record<string, any>): PipelineBuilder {
+    this.config.stages.push({
+      name: 'Data Validation',
+      type: 'data-validation',
+      orderIndex: this.stageIndex++,
+      config: config || { dataset: 'training_data.parquet', checks: 12, features: 28 },
+      decorators: ['logging', 'metrics'],
+    });
+    return this;
+  }
+
+  addFeatureEngineeringStage(config?: Record<string, any>): PipelineBuilder {
+    this.config.stages.push({
+      name: 'Feature Engineering',
+      type: 'feature-engineering',
+      orderIndex: this.stageIndex++,
+      config: config || { features: 47 },
+      decorators: ['logging', 'metrics'],
+    });
+    return this;
+  }
+
+  addModelTrainingStage(config?: Record<string, any>): PipelineBuilder {
+    this.config.stages.push({
+      name: 'Model Training',
+      type: 'model-training',
+      orderIndex: this.stageIndex++,
+      config: config || { model: 'XGBoost', trials: 50 },
+      decorators: ['logging', 'metrics', 'notification'],
+    });
+    return this;
+  }
+
+  addModelEvaluationStage(config?: Record<string, any>): PipelineBuilder {
+    this.config.stages.push({
+      name: 'Model Evaluation',
+      type: 'model-evaluation',
+      orderIndex: this.stageIndex++,
+      config: config || {},
+      decorators: ['logging', 'metrics'],
+    });
+    return this;
+  }
+
+  addModelRegistrationStage(config?: Record<string, any>): PipelineBuilder {
+    this.config.stages.push({
+      name: 'Model Registration',
+      type: 'model-registration',
+      orderIndex: this.stageIndex++,
+      config: config || {},
+      decorators: ['logging', 'notification'],
+    });
+    return this;
+  }
+
+  addCanaryDeployStage(config?: Record<string, any>): PipelineBuilder {
+    this.config.stages.push({
+      name: 'Canary Deploy',
+      type: 'canary-deploy',
+      orderIndex: this.stageIndex++,
+      config: config || { canaryPct: 10 },
+      decorators: ['logging', 'metrics', 'notification'],
+    });
+    return this;
+  }
+
+  addDriftCheckStage(config?: Record<string, any>): PipelineBuilder {
+    this.config.stages.push({
+      name: 'Drift Check',
+      type: 'drift-check',
+      orderIndex: this.stageIndex++,
+      config: config || {},
+      decorators: ['logging', 'metrics'],
     });
     return this;
   }

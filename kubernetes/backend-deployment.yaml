@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipeforge-backend
+  namespace: pipeforge
+  labels:
+    app: pipeforge
+    component: backend
+    version: "1.0.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pipeforge
+      component: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: pipeforge
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/your-org/pipeforge/backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4000
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pipeforge-secrets
+                  key: database-url
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pipeforge-secrets
+                  key: jwt-secret
+            - name: JWT_EXPIRES_IN
+              value: "1d"
+            - name: PORT
+              value: "4000"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /api/v1/metrics/dashboard
+              port: 4000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/metrics/dashboard
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      imagePullSecrets:
+        - name: ghcr-credentials
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pipeforge-backend
+  namespace: pipeforge
+  labels:
+    app: pipeforge
+    component: backend
+spec:
+  selector:
+    app: pipeforge
+    component: backend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4000
+      targetPort: 4000
+  type: ClusterIP
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: pipeforge-backend-hpa
+  namespace: pipeforge
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: pipeforge-backend
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80

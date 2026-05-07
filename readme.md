@@ -1,8 +1,8 @@
-# PipeForge — CI/CD Pipeline Simulator
+# PipeForge — Enterprise MLOps Platform
 
-### *Design • Build • Deploy • Monitor*
+### *Data → Features → Train → Evaluate → Register → Deploy → Monitor → Drift → Retrain*
 
-> **A Premium SaaS-inspired Mini CI/CD Pipeline Simulator** built for Software Design & Architecture coursework, demonstrating enterprise-grade software patterns, SOLID principles, and layered architecture.
+> **Built enterprise-grade end-to-end MLOps platform with automated training, model registry, CI/CD deployment, Kubernetes serving, real-time monitoring, and drift-triggered auto-retraining.**
 
 ---
 
@@ -13,41 +13,74 @@
 3. [Technology Stack](#3-technology-stack)
 4. [System Architecture](#4-system-architecture)
 5. [Complete Folder Structure](#5-complete-folder-structure)
-6. [Software Design Patterns](#6-software-design-patterns)
-   - 6.1 Builder Pattern
-   - 6.2 Factory Method Pattern
-   - 6.3 Abstract Factory Pattern
-   - 6.4 Adapter Pattern
-   - 6.5 Decorator Pattern
-   - 6.6 Composite Pattern
-   - 6.7 Chain of Responsibility
-   - 6.8 Command Pattern
-   - 6.9 State Pattern
-   - 6.10 Observer Pattern
-   - 6.11 Plugin Architecture
-7. [SOLID Principles](#7-solid-principles)
-8. [Database Schema](#8-database-schema)
-9. [REST API Reference](#9-rest-api-reference)
-10. [WebSocket Events](#10-websocket-events)
-11. [Core Features](#11-core-features)
-12. [Setup & Installation](#12-setup--installation)
-13. [How to Run](#13-how-to-run)
+6. [MLOps Pipeline Workflow](#6-mlops-pipeline-workflow)
+7. [Software Design Patterns](#7-software-design-patterns)
+   - 7.1 Builder Pattern
+   - 7.2 Factory Method Pattern
+   - 7.3 Abstract Factory Pattern
+   - 7.4 Adapter Pattern
+   - 7.5 Decorator Pattern
+   - 7.6 Composite Pattern
+   - 7.7 Chain of Responsibility
+   - 7.8 Command Pattern
+   - 7.9 State Pattern
+   - 7.10 Observer Pattern
+   - 7.11 Plugin Architecture
+8. [SOLID Principles](#8-solid-principles)
+9. [Platform Modules](#9-platform-modules)
+   - 9.1 CI/CD Pipeline Engine
+   - 9.2 Experiment Tracking
+   - 9.3 Model Registry
+   - 9.4 Data Validation
+   - 9.5 Drift Detection & Monitoring
+   - 9.6 Feature Store
+10. [Database Schema](#10-database-schema)
+11. [REST API Reference](#11-rest-api-reference)
+12. [WebSocket Events](#12-websocket-events)
+13. [CI/CD with GitHub Actions](#13-cicd-with-github-actions)
+14. [Kubernetes Deployment](#14-kubernetes-deployment)
+15. [Setup & Installation](#15-setup--installation)
+16. [How to Run](#16-how-to-run)
 
 ---
 
 ## 1. Project Overview
 
-**PipeForge** simulates the workflow of modern DevOps tools like Jenkins, GitHub Actions, and GitLab CI/CD — but with a clean, architecture-focused implementation designed for academic study.
+**PipeForge** is an enterprise-grade MLOps platform that automates the complete machine learning lifecycle — from raw data to production inference.
 
-Users can:
-- Visually **design** deployment pipelines with a drag-and-drop builder
-- **Configure** each stage (timeout, retries, environment) with decorators
-- **Run** simulated CI/CD workflows stage-by-stage
-- **Monitor** execution in real time via WebSocket live logs
-- **Simulate failures** at any stage and trigger automatic rollback
-- **Analyze** deployment metrics with interactive charts
-- **Manage** plugin extensions from a marketplace
-- **Switch** cloud deployment providers (AWS / Azure / GCP)
+The platform implements the full ML deployment loop:
+
+```
+Raw Data Arrival
+      ↓
+Data Validation (Great Expectations-style)
+      ↓
+Feature Engineering (Feast Feature Store)
+      ↓
+Model Training (XGBoost / LightGBM / PyTorch + Optuna HPO)
+      ↓
+Experiment Tracking (MLflow-style)
+      ↓
+Model Evaluation (Champion vs Challenger)
+      ↓
+Model Registry (Versioned + Staged)
+      ↓
+Security Scan (Trivy)
+      ↓
+Canary Release (10% → 100% traffic)
+      ↓
+Production Inference API (/predict /health)
+      ↓
+Real-time Monitoring (Latency / Throughput / Error Rate)
+      ↓
+Drift Detection (PSI Score / Evidently AI-style)
+      ↓
+Auto-Retraining Trigger
+      ↓
+Automatic Rollback if unhealthy
+```
+
+PipeForge is architected with **11 proven design patterns**, **SOLID principles**, and a full **microservices-inspired modular structure** — making it production-ready and academically rigorous.
 
 ---
 
@@ -69,7 +102,7 @@ Password: admin123
 | **NestJS** | 11.x | Modular server framework (MVC + DI) |
 | **Prisma ORM** | 5.x | Type-safe database access |
 | **PostgreSQL** | 17 | Relational database (via Docker) |
-| **Socket.IO** | 4.x | Real-time WebSocket communication |
+| **Socket.IO** | 4.x | Real-time WebSocket streaming |
 | **Passport + JWT** | — | Authentication & authorization |
 | **bcrypt** | — | Secure password hashing |
 | **EventEmitter2** | — | Observer pattern / event bus |
@@ -79,71 +112,80 @@ Password: admin123
 | Technology | Version | Purpose |
 |---|---|---|
 | **Next.js** | 16.x | React full-stack framework (App Router) |
-| **TypeScript** | 5.x | Static typing |
+| **TypeScript** | 5.x | Static typing throughout |
 | **Tailwind CSS** | 4.x | Utility-first styling |
-| **shadcn/ui** | — | Accessible UI component library |
+| **shadcn/ui** | — | Accessible UI components |
 | **Zustand** | — | Client-side state management |
-| **Recharts** | — | Dashboard analytics charts |
+| **Recharts** | — | Dashboard + metrics charts |
 | **dnd-kit** | — | Drag-and-drop pipeline builder |
-| **Socket.io-client** | — | WebSocket live log consumption |
+| **Socket.io-client** | — | WebSocket live log streaming |
 | **React Hook Form + Zod** | — | Form validation |
-| **Sonner** | — | Toast notifications |
-| **next-themes** | — | Dark/light mode |
+| **date-fns** | — | Timestamp formatting |
 
-### Infrastructure
+### Infrastructure & MLOps
 | Tool | Purpose |
 |---|---|
-| **Docker** | Containerized PostgreSQL database |
-| **docker-compose** | Multi-service orchestration |
+| **Docker** | Containerized services |
+| **docker-compose** | Local multi-service orchestration |
+| **GitHub Actions** | CI (lint, type-check, build, Trivy scan) + CD (build, push, deploy) |
+| **Kubernetes** | Production orchestration with HPA autoscaling |
+| **Helm** | Kubernetes package manager chart |
+| **Trivy** | Container image vulnerability scanning |
 
 ---
 
 ## 4. System Architecture
 
-PipeForge uses a **monorepo structure** with strict separation of concerns:
-
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     BROWSER CLIENT                       │
-│  Next.js App Router  ─────────────  Socket.IO Client     │
-│  (React + Zustand)                  (Live Logs)          │
-└───────────────────┬─────────────────────┬───────────────┘
-                    │ HTTP REST            │ WebSocket
-                    ▼                      ▼
-┌─────────────────────────────────────────────────────────┐
-│                    NESTJS BACKEND                        │
-│                                                          │
-│  ┌──────────┐  ┌───────────┐  ┌───────────────────┐    │
-│  │   Auth   │  │ Pipelines │  │ Execution Engine  │    │
-│  │  Module  │  │  Module   │  │  (Chain+State+Cmd) │   │
-│  └──────────┘  └───────────┘  └───────────────────┘    │
-│                                                          │
-│  ┌──────────┐  ┌───────────┐  ┌───────────────────┐    │
-│  │ Rollback │  │  Plugins  │  │   Providers       │    │
-│  │  Module  │  │  Module   │  │ (AWS/Azure/GCP)   │    │
-│  └──────────┘  └───────────┘  └───────────────────┘    │
-│                                                          │
-│  ┌──────────┐  ┌───────────┐  ┌───────────────────┐    │
-│  │ Metrics  │  │   Notifs  │  │  WebSocket        │    │
-│  │  Module  │  │  Module   │  │  Gateway          │    │
-│  └──────────┘  └───────────┘  └───────────────────┘    │
-│                                                          │
-│              EventEmitter2 (Observer Bus)                │
-└───────────────────────┬─────────────────────────────────┘
-                        │ Prisma ORM
-                        ▼
-┌─────────────────────────────────────────────────────────┐
-│              PostgreSQL (Docker port 5433)               │
-│  User | Pipeline | Stage | Execution | Plugin | Notif   │
-└─────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│                        BROWSER CLIENT                          │
+│   Next.js App Router (React + Zustand + Recharts)             │
+│   CI/CD: Dashboard · Pipelines · Builder · Executions          │
+│   MLOps: Experiments · Model Registry · Monitoring · Drift     │
+└──────────────┬────────────────────────────┬───────────────────┘
+               │ HTTP REST                  │ WebSocket
+               ▼                            ▼
+┌───────────────────────────────────────────────────────────────┐
+│                       NESTJS BACKEND                           │
+│                                                                │
+│  ┌──────────┐  ┌───────────┐  ┌──────────────────────────┐   │
+│  │   Auth   │  │ Pipelines │  │   Execution Engine        │   │
+│  │  Module  │  │  Module   │  │ (Chain+State+Factory+Dec) │   │
+│  └──────────┘  └───────────┘  └──────────────────────────┘   │
+│                                                                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐    │
+│  │  Experiments │  │Model Registry│  │ Data Validation  │    │
+│  │   Module     │  │   Module     │  │    Module        │    │
+│  └──────────────┘  └──────────────┘  └──────────────────┘    │
+│                                                                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐    │
+│  │    Drift     │  │   Feature    │  │    Providers     │    │
+│  │  Detection   │  │    Store     │  │ (AWS/Azure/GCP)  │    │
+│  └──────────────┘  └──────────────┘  └──────────────────┘    │
+│                                                                │
+│  ┌──────────┐  ┌───────────┐  ┌──────────────────────────┐   │
+│  │ Rollback │  │  Plugins  │  │ WebSocket Gateway        │   │
+│  │  Module  │  │  Module   │  │ (Observer Pattern)        │   │
+│  └──────────┘  └───────────┘  └──────────────────────────┘   │
+│                                                                │
+│                  EventEmitter2 (Observer Bus)                  │
+└─────────────────────────────┬─────────────────────────────────┘
+                              │ Prisma ORM
+                              ▼
+┌───────────────────────────────────────────────────────────────┐
+│                  PostgreSQL (Docker port 5433)                  │
+│  User · Pipeline · Stage · Execution · Plugin · Notification   │
+│  Experiment · ModelVersion · DataValidationRun                 │
+│  DriftAlert · Feature                                          │
+└───────────────────────────────────────────────────────────────┘
 ```
 
-### Architectural Patterns Used
+### Architectural Patterns
 - **Layered Architecture** — Controller → Service → Repository (Prisma)
-- **Dependency Injection** — NestJS IoC container wires all services
+- **Dependency Injection** — NestJS IoC container
 - **Repository Pattern** — PrismaService abstracts all DB access
-- **Event-Driven Architecture** — EventEmitter2 decouples execution from notifications/WebSocket
-- **Plugin Architecture** — Dynamically loadable plugins via IPlugin interface
+- **Event-Driven Architecture** — EventEmitter2 decouples execution from side effects
+- **Plugin Architecture** — Dynamically loadable plugins via `IPlugin` interface
 - **MVC-inspired Frontend** — Pages (View) → Stores (Model) → Services (Controller)
 
 ---
@@ -153,266 +195,241 @@ PipeForge uses a **monorepo structure** with strict separation of concerns:
 ```
 c:\code\sdaproject\
 │
-├── frontend/                          ← Next.js App
+├── .github/
+│   └── workflows/
+│       ├── ci.yml              ← Lint, type-check, build, Trivy scan, smoke test
+│       └── cd.yml              ← Docker build+push, staging deploy, canary prod deploy
+│
+├── kubernetes/
+│   ├── namespace.yaml          ← Kubernetes namespace
+│   ├── backend-deployment.yaml ← Backend Deployment + Service + HPA autoscaler
+│   ├── frontend-deployment.yaml← Frontend Deployment + Service
+│   ├── ingress.yaml            ← Nginx Ingress + TLS
+│   ├── configmap-secret.yaml   ← ConfigMap + Secret template
+│   └── helm/
+│       ├── Chart.yaml          ← Helm chart metadata
+│       └── values.yaml         ← Configurable deployment values
+│
+├── frontend/                   ← Next.js App
+│   ├── Dockerfile              ← Multi-stage production build
 │   └── src/
 │       ├── app/
-│       │   ├── layout.tsx             ← Root layout + ThemeProvider
-│       │   ├── page.tsx               ← Root redirect (login/dashboard)
-│       │   ├── login/page.tsx         ← JWT login form
-│       │   └── (dashboard)/           ← Auth-protected route group
-│       │       ├── layout.tsx         ← Auth guard wrapper
-│       │       ├── dashboard/page.tsx ← KPI cards + Recharts
-│       │       ├── pipelines/page.tsx ← CRUD pipeline list
-│       │       ├── builder/page.tsx   ← Drag-drop builder
-│       │       ├── executions/page.tsx← Live log viewer
-│       │       ├── plugins/page.tsx   ← Plugin marketplace
-│       │       └── settings/page.tsx  ← Theme + provider config
-│       │
-│       ├── components/
-│       │   ├── shared/
-│       │   │   ├── Sidebar.tsx        ← Navigation sidebar
-│       │   │   └── Navbar.tsx         ← Top bar + notifications
-│       │   └── ui/                    ← shadcn components
-│       │
-│       ├── stores/                    ← Zustand state stores
-│       │   ├── auth.store.ts          ← User auth + token
-│       │   ├── pipeline.store.ts      ← Builder state
-│       │   └── notification.store.ts  ← Unread count
+│       │   ├── layout.tsx
+│       │   ├── page.tsx
+│       │   ├── login/page.tsx
+│       │   └── (dashboard)/
+│       │       ├── layout.tsx
+│       │       ├── dashboard/page.tsx       ← KPI + charts
+│       │       ├── pipelines/page.tsx       ← Pipeline CRUD
+│       │       ├── builder/page.tsx         ← Drag-drop builder
+│       │       ├── executions/page.tsx      ← Live log viewer
+│       │       ├── experiments/page.tsx     ← Experiment tracking (NEW)
+│       │       ├── model-registry/page.tsx  ← Model versions (NEW)
+│       │       ├── monitoring/page.tsx      ← Inference monitoring (NEW)
+│       │       ├── drift/page.tsx           ← Drift detection (NEW)
+│       │       ├── plugins/page.tsx
+│       │       └── settings/page.tsx
 │       │
 │       ├── services/
-│       │   └── api.ts                 ← Axios client + all API calls
-│       ├── hooks/
-│       │   └── useSocket.ts           ← Socket.IO hook
-│       ├── providers/
-│       │   └── theme-provider.tsx     ← next-themes wrapper
-│       └── types/
-│           └── index.ts               ← Shared TypeScript interfaces
+│       │   └── api.ts          ← Axios client + all API calls (ML endpoints added)
+│       └── components/
+│           └── shared/
+│               └── Sidebar.tsx ← Updated: CI/CD + ML Platform + System sections
 │
-├── backend/                           ← NestJS App
+├── backend/                    ← NestJS App
+│   ├── Dockerfile              ← Multi-stage production build
 │   ├── src/
-│   │   ├── main.ts                    ← Bootstrap: CORS, prefix, port
-│   │   ├── app.module.ts              ← Root module
-│   │   │
-│   │   ├── prisma/                    ← Global DB service
-│   │   ├── auth/                      ← JWT login, guards, strategy
-│   │   │
+│   │   ├── app.module.ts
+│   │   ├── auth/
 │   │   ├── pipelines/
-│   │   │   ├── builders/              ← Builder + Director patterns
-│   │   │   ├── composite/             ← Composite pattern
-│   │   │   ├── dto/
-│   │   │   ├── pipelines.service.ts
-│   │   │   └── pipelines.controller.ts
-│   │   │
+│   │   │   ├── builders/
+│   │   │   │   ├── pipeline.builder.ts  ← +7 ML stage builder methods
+│   │   │   │   └── pipeline.director.ts ← +3 ML pipeline templates
+│   │   │   └── composite/
 │   │   ├── execution/
-│   │   │   ├── factories/             ← Factory Method (StageFactory)
-│   │   │   ├── decorators/            ← Decorator pattern (wrappers)
-│   │   │   ├── chain/                 ← Chain of Responsibility
-│   │   │   ├── commands/              ← Command pattern
-│   │   │   ├── states/                ← State pattern
-│   │   │   ├── execution.service.ts   ← Core execution engine
-│   │   │   └── execution.controller.ts
+│   │   │   └── factories/
+│   │   │       └── stage.factory.ts     ← +7 ML stage executors
 │   │   │
-│   │   ├── rollback/                  ← Rollback engine
-│   │   ├── notifications/             ← Alert management
-│   │   ├── websocket/                 ← Socket.IO gateway (Observer)
-│   │   ├── plugins/                   ← Plugin architecture
-│   │   ├── providers/
-│   │   │   ├── adapters/              ← Adapter pattern (AWS/Azure/GCP)
-│   │   │   └── factories/             ← Abstract Factory pattern
-│   │   └── metrics/                   ← Analytics aggregation
+│   │   ├── experiments/        ← Experiment tracking (NEW)
+│   │   ├── model-registry/     ← Model versioning + promotion (NEW)
+│   │   ├── data-validation/    ← Data quality checks (NEW)
+│   │   ├── drift-detection/    ← PSI drift + inference metrics (NEW)
+│   │   ├── feature-store/      ← Feature catalog (NEW)
+│   │   │
+│   │   ├── rollback/
+│   │   ├── notifications/
+│   │   ├── websocket/
+│   │   ├── plugins/
+│   │   ├── metrics/
+│   │   └── providers/
+│   │       ├── adapters/       ← AWS / Azure / GCP adapters
+│   │       └── factories/      ← Abstract cloud factory
 │   │
 │   └── prisma/
-│       ├── schema.prisma              ← Database models
-│       └── seed.ts                    ← Demo data seeder
+│       ├── schema.prisma       ← +5 ML models (Experiment, ModelVersion, etc.)
+│       └── seed.ts             ← Full ML dataset seeded
 │
-├── docker-compose.yml                 ← PostgreSQL container
-└── .env                               ← Environment variables
+└── docker-compose.yml          ← PostgreSQL container
 ```
 
 ---
 
-## 6. Software Design Patterns
+## 6. MLOps Pipeline Workflow
 
-This is the most academically important section. Every pattern listed below is **fully implemented** in the codebase with real working code.
+### Automated ML Lifecycle
+
+When new data arrives (via scheduled trigger or API call):
+
+1. **Data Validation** — Schema checks, null rates, distribution shift (Great Expectations-style)
+2. **Feature Engineering** — Aggregate features computed, stored in Feast Feature Store
+3. **Model Training** — XGBoost/LightGBM/PyTorch trained with Optuna HPO (50 trials)
+4. **Experiment Tracking** — Metrics, params, and artifacts logged (MLflow-style)
+5. **Model Evaluation** — Champion vs. Challenger comparison on holdout set
+6. **Model Registry** — New version registered with stage: `candidate → staging → production`
+7. **Security Scan** — Trivy container vulnerability check
+8. **Canary Deploy** — 10% traffic routed to new model, metrics monitored
+9. **Full Promotion** — If error rate < 1% and latency < SLA, 100% traffic promoted
+10. **Production Monitoring** — Latency P50/P99, throughput, error rate tracked
+11. **Drift Detection** — PSI score computed on live data; concept/data/label drift monitored
+12. **Auto-Retrain** — If PSI > 0.20, pipeline re-triggered automatically
+13. **Rollback** — Unhealthy releases rolled back to previous stable version
+
+### ML Pipeline Templates
+
+Three new pipeline templates available in the Builder:
+
+| Template | Stages | Use Case |
+|---|---|---|
+| `mltraining` | DataValidation → FeatureEng → Train → Evaluate → Register | Model training from scratch |
+| `mldeploy` | SecurityScan → Canary → Monitor → DriftCheck | Deploy existing model |
+| `fullmlops` | All 9 stages end-to-end | Complete production MLOps workflow |
+
+### ML Stage Executors
+
+7 new stage executors added to `StageFactory`:
+
+| Executor | Type | Simulates |
+|---|---|---|
+| `DataValidationExecutor` | `data-validation` | Great Expectations suite (12 checks) |
+| `FeatureEngineeringExecutor` | `feature-engineering` | Feast feature computation + encoding |
+| `ModelTrainingExecutor` | `model-training` | XGBoost/Optuna HPO training loop |
+| `ModelEvaluationExecutor` | `model-evaluation` | Champion vs Challenger AUC comparison |
+| `ModelRegistrationExecutor` | `model-registration` | MLflow Model Registry artifact storage |
+| `CanaryDeployExecutor` | `canary-deploy` | Traffic split + latency/error monitoring |
+| `DriftCheckExecutor` | `drift-check` | Evidently AI PSI + KL-divergence check |
 
 ---
 
-### 6.1 Builder Pattern *(Creational)*
+## 7. Software Design Patterns
+
+Every pattern below is **fully implemented** in working code.
+
+---
+
+### 7.1 Builder Pattern *(Creational)*
 
 **File:** `backend/src/pipelines/builders/pipeline.builder.ts`
 
-**Intent:** Separate the construction of a complex object from its representation, so the same construction process can create different representations.
+**Intent:** Separate complex object construction from representation.
 
-**Why PipeForge uses it:** Pipelines vary greatly in complexity. A Quick Deploy pipeline has 2 stages while a Full QA pipeline has 5+. The Builder handles this variation elegantly without needing different constructors.
-
-**Implementation:**
+**ML Extension:** Builder now includes 7 ML stage methods alongside original CI/CD methods:
 
 ```typescript
-// PipelineBuilder — fluent API for constructing pipelines step-by-step
 export class PipelineBuilder {
-  private config: PipelineConfig = { name: '', provider: 'AWS', stages: [] };
-  private stageIndex = 0;
-
-  setName(name: string): PipelineBuilder {
-    this.config.name = name;
-    return this; // enables method chaining
-  }
-
-  addBuildStage(config?: Record<string, any>): PipelineBuilder {
+  addDataValidationStage(config?: Record<string, any>): PipelineBuilder {
     this.config.stages.push({
-      name: 'Build', type: 'build',
+      name: 'Data Validation', type: 'data-validation',
       orderIndex: this.stageIndex++,
-      config: config || { timeout: 60, retries: 2 },
-      decorators: ['logging', 'retry'],
+      config: config || { dataset: 'training_data.parquet', checks: 12 },
+      decorators: ['logging', 'metrics'],
     });
     return this;
   }
 
-  addDeployStage(config?: Record<string, any>): PipelineBuilder {
+  addModelTrainingStage(config?: Record<string, any>): PipelineBuilder {
     this.config.stages.push({
-      name: 'Deploy', type: 'deploy',
+      name: 'Model Training', type: 'model-training',
       orderIndex: this.stageIndex++,
-      config: config || { region: 'us-east-1', replicas: 3 },
-      decorators: ['logging', 'notification'],
+      config: config || { model: 'XGBoost', trials: 50 },
+      decorators: ['logging', 'metrics', 'notification'],
     });
     return this;
   }
 
-  build(): PipelineConfig {
-    if (!this.config.name) throw new Error('Pipeline name is required');
-    return { ...this.config };
-  }
+  // + addFeatureEngineeringStage, addModelEvaluationStage,
+  //   addModelRegistrationStage, addCanaryDeployStage, addDriftCheckStage
 }
 ```
 
-**Usage with Director:**
-
+**Full MLOps pipeline via Director:**
 ```typescript
-// PipelineDirector — encapsulates common construction sequences
-export class PipelineDirector {
-  static buildFullQAPipeline(name: string): PipelineConfig {
-    return new PipelineBuilder()
-      .setName(name)
-      .setProvider('AWS')
-      .addBuildStage()
-      .addTestStage()
-      .addSecurityScan()
-      .addDeployStage()
-      .addMonitorStage()
-      .build();
-  }
-}
+PipelineDirector.buildFullMLOpsPipeline('Fraud Detector v2')
+// → DataValidation → FeatureEng → Train → Evaluate → Register → Security → Canary → Monitor → DriftCheck
 ```
-
-**Templates available via Director:**
-- `node` → Build → Test → Deploy
-- `docker` → Build → Test → Deploy (Docker/GCP)
-- `fullqa` → Build → Test → Security → Deploy → Monitor
-- `quickdeploy` → Build → Deploy
 
 ---
 
-### 6.2 Factory Method Pattern *(Creational)*
+### 7.2 Factory Method Pattern *(Creational)*
 
 **File:** `backend/src/execution/factories/stage.factory.ts`
 
-**Intent:** Define an interface for creating an object, but let subclasses decide which class to instantiate.
+**Intent:** Define an interface for creating objects, letting subclasses decide which class to instantiate.
 
-**Why PipeForge uses it:** The execution engine must create a different executor depending on the stage type (`build`, `test`, `deploy`, etc.) without being coupled to those classes.
-
-**Implementation:**
+**ML Extension:** 7 new ML executors added to the registry:
 
 ```typescript
-// IStageExecutor — the product interface
-export interface IStageExecutor {
-  execute(config: any, forceFail?: boolean): Promise<{
-    success: boolean; logs: string[]; duration: number
-  }>;
-  getName(): string;
-}
-
-// Concrete products
-export class BuildStageExecutor implements IStageExecutor {
-  getName() { return 'Build'; }
+export class ModelTrainingExecutor implements IStageExecutor {
+  getName() { return 'Model Training'; }
   async execute(config: any, forceFail = false) {
-    // simulates npm install, compilation, etc.
-    if (forceFail) return { success: false, logs: ['[Build] ERROR: Compilation failed'], duration: ... };
-    return { success: true, logs: ['[Build] Build successful'], duration: ... };
+    logs.push(`[Training] Initializing ${config.model || 'XGBoost'} trainer`);
+    logs.push(`[Training] Starting Optuna HPO (${config.trials || 50} trials)`);
+    // ... training simulation ...
+    logs.push(`[Training] Best params: learning_rate=0.042, max_depth=6, n_estimators=412`);
+    logs.push(`[Training] 5-fold CV: AUC=${auc}, F1=${f1}`);
+    return { success: true, logs, duration: Date.now() - start };
   }
 }
 
-export class DeployStageExecutor implements IStageExecutor {
-  getName() { return 'Deploy'; }
-  async execute(config: any, forceFail = false) {
-    // simulates container push, replica scaling
-  }
-}
-
-// 7 executors total: Build, Test, Security, Deploy, Monitor, Lint, Package
-
-// The Factory — decides which executor to create
 export class StageFactory {
-  private static executors: Record<string, new () => IStageExecutor> = {
+  private static executors = {
+    // Original CI/CD executors
     build: BuildStageExecutor,
     test: TestStageExecutor,
-    security: SecurityStageExecutor,
-    deploy: DeployStageExecutor,
-    monitor: MonitorStageExecutor,
-    lint: LintStageExecutor,
-    package: PackageStageExecutor,
-  };
+    // ... existing ...
 
-  static create(type: string): IStageExecutor {
-    const ExecutorClass = this.executors[type.toLowerCase()] || BuildStageExecutor;
-    return new ExecutorClass(); // factory decision
-  }
+    // New ML executors
+    'data-validation': DataValidationExecutor,
+    'feature-engineering': FeatureEngineeringExecutor,
+    'model-training': ModelTrainingExecutor,
+    'model-evaluation': ModelEvaluationExecutor,
+    'model-registration': ModelRegistrationExecutor,
+    'canary-deploy': CanaryDeployExecutor,
+    'drift-check': DriftCheckExecutor,
+  };
 }
 ```
 
-**Used in execution engine:**
-```typescript
-// ExecutionService — calls factory without knowing concrete type
-const executor = StageFactory.create(stage.type); // → BuildStageExecutor, TestStageExecutor, etc.
-```
-
-**Open/Closed Principle:** To add a `LintStageExecutor`, you only add a new class and register it in the map — the engine never changes.
+**Open/Closed Principle:** Adding `ModelTrainingExecutor` required zero changes to the execution engine.
 
 ---
 
-### 6.3 Abstract Factory Pattern *(Creational)*
+### 7.3 Abstract Factory Pattern *(Creational)*
 
 **File:** `backend/src/providers/factories/cloud.factory.ts`
 
-**Intent:** Provide an interface for creating families of related objects without specifying concrete classes.
-
-**Why PipeForge uses it:** Each cloud provider (AWS, Azure, GCP) is a family of related services. The Abstract Factory ensures the entire family is created consistently.
-
-**Implementation:**
+**Intent:** Provide an interface for creating families of related objects.
 
 ```typescript
-// Abstract Factory interface
 export interface ICloudProviderFactory {
   createDeploymentClient(): ICloudProvider;
   getProviderName(): string;
 }
 
-// Concrete factories — one per cloud provider family
 export class AWSFactory implements ICloudProviderFactory {
   createDeploymentClient() { return new AWSAdapter(); }
   getProviderName() { return 'AWS'; }
 }
 
-export class AzureFactory implements ICloudProviderFactory {
-  createDeploymentClient() { return new AzureAdapter(); }
-  getProviderName() { return 'Azure'; }
-}
-
-export class GCPFactory implements ICloudProviderFactory {
-  createDeploymentClient() { return new GCPAdapter(); }
-  getProviderName() { return 'GCP'; }
-}
-
-// Resolver — selects the right factory at runtime
 export class CloudFactoryResolver {
   static resolve(provider: string): ICloudProviderFactory {
     switch (provider.toUpperCase()) {
@@ -425,623 +442,355 @@ export class CloudFactoryResolver {
 }
 ```
 
-**Usage:**
-```typescript
-const factory = CloudFactoryResolver.resolve("AWS");
-const deployClient = factory.createDeploymentClient();
-await deployClient.deploy({ region: 'us-east-1', replicas: 3 });
-```
-
 ---
 
-### 6.4 Adapter Pattern *(Structural)*
+### 7.4 Adapter Pattern *(Structural)*
 
 **File:** `backend/src/providers/adapters/cloud.adapter.ts`
 
-**Intent:** Convert the interface of a class into another interface that clients expect. Lets incompatible interfaces work together.
-
-**Why PipeForge uses it:** AWS, Azure, and GCP all have completely different native APIs. The Adapter normalizes them behind a single `ICloudProvider` interface.
-
-**Implementation:**
+**Intent:** Normalize incompatible interfaces.
 
 ```typescript
-// Target interface — what the execution engine expects
 export interface ICloudProvider {
   deploy(config: any): Promise<{ success: boolean; message: string }>;
   rollback(config: any): Promise<{ success: boolean; message: string }>;
   monitor(config: any): Promise<{ healthy: boolean; latency: number }>;
-  getProviderName(): string;
 }
 
-// Adaptee — AWS native client (incompatible raw API)
-class AwsNativeClient {
-  async deploy(region: string, image: string, replicas: number) {
-    return { taskArn: `arn:aws:ecs:${region}:123:task/abc`, replicas };
-  }
-}
-
-// Adapter — wraps AWS native into ICloudProvider
+// AWS, Azure, GCP all expose different APIs — Adapters normalize them
 export class AWSAdapter implements ICloudProvider {
   private client = new AwsNativeClient();
-  getProviderName() { return 'AWS'; }
-
   async deploy(config: any) {
-    // Translates ICloudProvider.deploy() → aws.deploy()
     const result = await this.client.deploy(config.region, 'app:latest', config.replicas);
     return { success: true, message: `AWS ECS deployed ${result.replicas} replicas` };
   }
 }
-
-// Similarly: AzureAdapter wraps azure.launchContainer()
-// Similarly: GCPAdapter wraps gcp.runService()
 ```
-
-**Result:** The execution engine always calls `provider.deploy(config)` — it never knows whether it's AWS, Azure, or GCP.
 
 ---
 
-### 6.5 Decorator Pattern *(Structural)*
+### 7.5 Decorator Pattern *(Structural)*
 
 **File:** `backend/src/execution/decorators/stage.decorators.ts`
 
-**Intent:** Attach additional responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing.
-
-**Why PipeForge uses it:** Users can toggle optional behaviors (logging, retry, notifications, metrics) per stage without modifying the core executor.
-
-**Implementation:**
+**Intent:** Add responsibilities dynamically without subclassing.
 
 ```typescript
-// Base component interface
-export interface IStageExecutor { execute(config, forceFail?): Promise<...>; }
-
-// Abstract decorator — wraps another executor
-abstract class StageDecorator implements IStageExecutor {
-  constructor(protected wrappee: IStageExecutor) {}
-  getName() { return this.wrappee.getName(); }
-  abstract execute(config: any, forceFail?: boolean): Promise<...>;
-}
-
-// Concrete decorators
-export class LoggingDecorator extends StageDecorator {
-  async execute(config: any, forceFail?: boolean) {
-    console.log(`[LOG] Starting ${this.getName()}`);
-    const result = await this.wrappee.execute(config, forceFail); // delegate
-    console.log(`[LOG] ${this.getName()} → ${result.success ? 'PASS' : 'FAIL'}`);
-    return result;
-  }
-}
-
 export class RetryDecorator extends StageDecorator {
-  constructor(wrappee: IStageExecutor, private maxRetries = 2) { super(wrappee); }
-
   async execute(config: any, forceFail?: boolean) {
     let result = await this.wrappee.execute(config, forceFail);
     if (result.success) return result;
-    // Auto-retry on failure
     for (let i = 0; i < this.maxRetries; i++) {
-      result = await this.wrappee.execute(config, false); // retry without forceFail
+      result = await this.wrappee.execute(config, false);
       if (result.success) return result;
     }
     return result;
   }
 }
 
-export class MetricsDecorator extends StageDecorator {
-  async execute(config: any, forceFail?: boolean) {
-    const result = await this.wrappee.execute(config, forceFail);
-    result.logs.push(`[Metrics] Duration: ${result.duration}ms`);
-    return result;
-  }
-}
-
-// Helper — stacks decorators based on user configuration
-export function applyDecorators(executor: IStageExecutor, decorators: string[]): IStageExecutor {
-  let wrapped = executor;
-  for (const dec of decorators) {
-    switch (dec) {
-      case 'logging':      wrapped = new LoggingDecorator(wrapped); break;
-      case 'retry':        wrapped = new RetryDecorator(wrapped); break;
-      case 'metrics':      wrapped = new MetricsDecorator(wrapped); break;
-      case 'notification': wrapped = new NotificationDecorator(wrapped); break;
-      case 'security':     wrapped = new SecurityDecorator(wrapped); break;
-    }
-  }
-  return wrapped;
-}
-```
-
-**Stacking example:**
-```typescript
-// A Build stage with logging + retry wraps like Russian dolls:
-new RetryDecorator(
-  new LoggingDecorator(
-    new BuildStageExecutor()
+// ML stages can stack: Logging + Metrics + Notification
+new NotificationDecorator(
+  new MetricsDecorator(
+    new LoggingDecorator(
+      new ModelTrainingExecutor()
+    )
   )
 )
-// Each execute() call passes through every decorator layer
 ```
 
 ---
 
-### 6.6 Composite Pattern *(Structural)*
+### 7.6 Composite Pattern *(Structural)*
 
 **File:** `backend/src/pipelines/composite/stage.composite.ts`
 
-**Intent:** Compose objects into tree structures to represent part-whole hierarchies. Clients treat individual objects and compositions uniformly.
-
-**Why PipeForge uses it:** A QA stage group (Unit Test + Integration Test + Security Test) can be treated as a single stage by the engine.
-
-**Implementation:**
+**Intent:** Treat individual objects and compositions uniformly.
 
 ```typescript
-// Component interface — uniform treatment
-export interface IStageComponent {
-  getName(): string;
-  execute(): Promise<{ success: boolean; logs: string[] }>;
-}
+// An entire ML suite treated as a single stage
+const mlSuite = new CompositeStageGroup('ML Training Suite');
+mlSuite.add(new LeafStage('Data Validation', 'data-validation'));
+mlSuite.add(new LeafStage('Feature Engineering', 'feature-engineering'));
+mlSuite.add(new LeafStage('Model Training', 'model-training'));
 
-// Leaf — a single indivisible stage
-export class LeafStage implements IStageComponent {
-  constructor(private name: string, private type: string) {}
-  getName() { return this.name; }
-  async execute() {
-    return { success: true, logs: [`[${this.type}] ${this.name} completed`] };
-  }
-}
-
-// Composite — a group of stages treated as one
-export class CompositeStageGroup implements IStageComponent {
-  private children: IStageComponent[] = [];
-  constructor(private groupName: string) {}
-  getName() { return this.groupName; }
-  add(component: IStageComponent) { this.children.push(component); }
-
-  async execute() {
-    const allLogs: string[] = [`[Group] Starting ${this.groupName}`];
-    for (const child of this.children) {
-      const result = await child.execute();
-      allLogs.push(...result.logs);
-      if (!result.success) return { success: false, logs: allLogs }; // fail fast
-    }
-    return { success: true, logs: allLogs };
-  }
-}
-```
-
-**Usage:**
-```typescript
-const qaGroup = new CompositeStageGroup('QA Suite');
-qaGroup.add(new LeafStage('Unit Test', 'test'));
-qaGroup.add(new LeafStage('Integration Test', 'test'));
-qaGroup.add(new LeafStage('Security Scan', 'security'));
-
-// The engine calls qaGroup.execute() — same as calling any single stage
-await qaGroup.execute();
+// Engine calls mlSuite.execute() — identical to a single stage
+await mlSuite.execute();
 ```
 
 ---
 
-### 6.7 Chain of Responsibility *(Behavioral)*
+### 7.7 Chain of Responsibility *(Behavioral)*
 
 **File:** `backend/src/execution/chain/execution.chain.ts`
 
-**Intent:** Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle the request. Chain the receiving objects and pass the request along the chain.
+**Intent:** Pass requests along a chain; each handler decides to process or pass.
 
-**Why PipeForge uses it:** Pipeline stages execute sequentially. Each stage decides whether to pass control to the next. If a stage fails, the chain stops.
-
-**Implementation:**
-
-```typescript
-export class ExecutionChainHandler {
-  private next: ExecutionChainHandler | null = null;
-
-  constructor(private stage: ChainStage) {}
-
-  // Links handler to the next in chain
-  setNext(handler: ExecutionChainHandler): ExecutionChainHandler {
-    this.next = handler;
-    return handler; // allows fluent chaining
-  }
-
-  async handle(allLogs: any[]): Promise<{ success: boolean; failedStage?: string }> {
-    // Each handler processes its own stage
-    const result = await this.stage.executor.execute(this.stage.config, this.stage.forceFail);
-
-    for (const log of result.logs) {
-      allLogs.push({ time: new Date().toLocaleTimeString(), message: log, stage: this.stage.name });
-    }
-
-    if (!result.success) {
-      return { success: false, failedStage: this.stage.name }; // STOP chain
-    }
-
-    // Pass to next handler if exists
-    if (this.next) {
-      return this.next.handle(allLogs);
-    }
-
-    return { success: true }; // End of chain — all stages passed
-  }
-}
-
-// Builder utility — creates the chain from an array of stages
-export function buildExecutionChain(stages: ChainStage[]): ExecutionChainHandler | null {
-  if (stages.length === 0) return null;
-  const handlers = stages.map(s => new ExecutionChainHandler(s));
-  for (let i = 0; i < handlers.length - 1; i++) {
-    handlers[i].setNext(handlers[i + 1]); // link Build → Test → Deploy → Monitor
-  }
-  return handlers[0]; // return head of chain
-}
 ```
-
-**Flow:**
-```
-Build Handler → Test Handler → Deploy Handler → Monitor Handler
-   ↓ pass          ↓ pass          ↓ FAIL
-                              [chain stops, rollback triggered]
+DataValidation → FeatureEng → ModelTraining → Evaluation → Registration → Canary
+     ↓ pass           ↓ pass         ↓ FAIL
+                                [chain stops, auto-rollback triggered]
 ```
 
 ---
 
-### 6.8 Command Pattern *(Behavioral)*
+### 7.8 Command Pattern *(Behavioral)*
 
 **File:** `backend/src/execution/commands/execution.commands.ts`
 
-**Intent:** Encapsulate a request as an object, thereby letting you parameterize clients with different requests, queue operations, and support undo.
-
-**Why PipeForge uses it:** Pipeline operations (start execution, rollback, retry) become undoable commands tracked by an `ExecutionManager`.
-
-**Implementation:**
+**Intent:** Encapsulate requests as undoable command objects.
 
 ```typescript
-// Command interface
-export interface ICommand {
-  execute(): Promise<any>;
-  undo?(): Promise<any>;
-}
-
-// Concrete commands
 export class ExecutePipelineCommand implements ICommand {
-  constructor(
-    private pipelineId: string,
-    private executionService: any,
-    private options: any,
-  ) {}
-
-  async execute() {
-    return this.executionService.runPipeline(this.pipelineId, this.options);
-  }
+  async execute() { return this.executionService.runPipeline(this.pipelineId, this.options); }
 }
 
 export class RollbackCommand implements ICommand {
-  constructor(private executionId: string, private rollbackService: any) {}
-
-  async execute() {
-    return this.rollbackService.rollback(this.executionId);
-  }
+  async execute() { return this.rollbackService.rollback(this.executionId); }
 }
 
-// Invoker — manages command history for undo support
-export class ExecutionManager {
-  private history: ICommand[] = [];
-
-  async invoke(command: ICommand): Promise<any> {
-    const result = await command.execute();
-    this.history.push(command); // stored for potential undo
-    return result;
-  }
-
-  async undoLast(): Promise<any> {
-    const last = this.history.pop();
-    if (last?.undo) return last.undo();
-  }
-}
+// ExecutionManager stores command history for undo support
+await manager.invoke(new ExecutePipelineCommand(...));
+await manager.undoLast(); // → triggers RollbackCommand
 ```
 
 ---
 
-### 6.9 State Pattern *(Behavioral)*
+### 7.9 State Pattern *(Behavioral)*
 
 **File:** `backend/src/execution/states/pipeline.state.ts`
 
-**Intent:** Allow an object to alter its behavior when its internal state changes.
+**Intent:** Alter behavior based on internal state.
 
-**Why PipeForge uses it:** A pipeline behaves differently depending on whether it's `Idle`, `Running`, `Failed`, etc. The State pattern eliminates chains of `if/else` for state-dependent behavior.
-
-**Implementation:**
-
-```typescript
-// State interface
-export interface IPipelineState {
-  getType(): PipelineStateType;
-  canStart(): boolean;    // can a new execution be triggered?
-  canCancel(): boolean;   // can current execution be cancelled?
-  canRollback(): boolean; // is rollback available?
-  getLabel(): string;     // display label
-  getColor(): string;     // UI color hint
-}
-
-// Concrete states — each defines its own behavior
-export class IdleState implements IPipelineState {
-  getType() { return 'idle' as const; }
-  canStart()    { return true;  } // can start
-  canCancel()   { return false; } // nothing to cancel
-  canRollback() { return false; } // nothing to rollback
-  getLabel() { return 'Idle'; }
-  getColor() { return 'gray'; }
-}
-
-export class RunningState implements IPipelineState {
-  getType() { return 'running' as const; }
-  canStart()    { return false; } // already running
-  canCancel()   { return true;  } // can be cancelled
-  canRollback() { return false; } // can't rollback mid-run
-  getLabel() { return 'Running'; }
-  getColor() { return 'blue'; }
-}
-
-export class FailedState implements IPipelineState {
-  getType() { return 'failed' as const; }
-  canStart()    { return true; }  // can retry
-  canCancel()   { return false; }
-  canRollback() { return true; }  // rollback available
-  getLabel() { return 'Failed'; }
-  getColor() { return 'red'; }
-}
-
-// Context — manages transitions
-export class PipelineStateContext {
-  private state: IPipelineState;
-
-  constructor(initialState: PipelineStateType = 'idle') {
-    this.state = this.createState(initialState);
-  }
-
-  transition(newState: PipelineStateType): void {
-    this.state = this.createState(newState); // transition
-  }
-
-  getState() { return this.state; }
-}
 ```
-
-**State transitions in the execution engine:**
-```
-Idle ──[start]──► Running ──[all stages pass]──► Success
+Idle ──[start]──► Running ──[all pass]──► Success
                       │
-                   [stage fails]
-                      │
+                 [stage fails]
                       ▼
-                   Failed ──[rollback triggered]──► Rollback ──► Idle
+                   Failed ──[rollback]──► Rollback ──► Idle
 ```
 
 ---
 
-### 6.10 Observer Pattern *(Behavioral)*
+### 7.10 Observer Pattern *(Behavioral)*
 
-**Files:**
-- `backend/src/websocket/execution.gateway.ts` — Observer (listener)
-- `backend/src/execution/execution.service.ts` — Subject (emitter)
+**Files:** `websocket/execution.gateway.ts` + `execution/execution.service.ts`
 
-**Intent:** Define a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically.
-
-**Why PipeForge uses it:** When a stage completes, multiple systems need to know: the WebSocket gateway (to push to browser), the metrics service, the notifications service, the audit trail. The Observer pattern decouples the execution engine from all these consumers.
-
-**Implementation:**
+**Intent:** Notify multiple dependents when state changes.
 
 ```typescript
-// Subject (Observable) — ExecutionService
-// Emits events without knowing who is listening
-@Injectable()
-export class ExecutionService {
-  constructor(private eventEmitter: EventEmitter2) {}
+// Execution engine emits events (Subject)
+this.eventEmitter.emit('execution.log', { executionId, message, stage });
+this.eventEmitter.emit('drift.detected', { alertId, modelName, psiScore });
 
-  private async runExecution(executionId: string, pipeline: any, options: any) {
-    // ...stage loop...
-
-    // Emit events — subject notifies all observers
-    this.eventEmitter.emit('execution.started',       { executionId, pipelineId });
-    this.eventEmitter.emit('execution.stage',         { executionId, stageName, status: 'running' });
-    this.eventEmitter.emit('execution.log',           { executionId, message, time, stage });
-    this.eventEmitter.emit('execution.success',       { executionId, pipelineId });
-    this.eventEmitter.emit('execution.failed',        { executionId, failedStage });
-    this.eventEmitter.emit('execution.rollback',      { executionId });
-  }
-}
-
-// Observer — ExecutionGateway
-// Listens for events and pushes to WebSocket clients
-@WebSocketGateway({ cors: { origin: '*' } })
-export class ExecutionGateway {
-  @WebSocketServer() server: Server;
-
-  @OnEvent('execution.started')
-  handleExecutionStarted(payload: any) {
-    this.server.emit('execution:start', payload); // push to all browsers
-  }
-
-  @OnEvent('execution.log')
-  handleLog(payload: any) {
-    this.server.emit('execution:log', payload); // live log streaming
-  }
-
-  @OnEvent('execution.failed')
-  handleFailed(payload: any) {
-    this.server.emit('execution:failed', payload);
-  }
-}
-```
-
-**Event flow:**
-```
-ExecutionService.emit('execution.log')
-    │
-    ├──► ExecutionGateway → WebSocket → Browser (live logs)
-    ├──► NotificationsService → creates DB notification
-    └──► MetricsService → updates counters
+// Multiple observers react independently:
+// → ExecutionGateway → pushes to browser WebSocket
+// → NotificationsService → creates DB notification
+// → DriftDetectionService → triggers auto-retrain
 ```
 
 ---
 
-### 6.11 Plugin Architecture
+### 7.11 Plugin Architecture
 
 **File:** `backend/src/plugins/plugins.service.ts`
 
-**Intent:** Allow new functionality to be added to the system without modifying existing code, by loading implementations of a common interface at runtime.
-
-**Why PipeForge uses it:** Slack notifier, Discord alerts, Email notifier, AI Advisor, etc. are loaded dynamically — the core system is unaware of their internal implementations.
-
-**Implementation:**
-
 ```typescript
-// Plugin contract — every plugin must implement this
-export interface IPlugin {
-  init(): void;
-  execute(context: any): Promise<void>;
-  destroy(): void;
-}
-
-// Concrete plugins
-export class SlackNotifierPlugin implements IPlugin {
-  init()    { console.log('[Slack] Plugin initialized'); }
-  async execute(ctx: any) { /* send Slack message */ }
-  destroy() { console.log('[Slack] Plugin unloaded'); }
-}
-
-export class EmailNotifierPlugin implements IPlugin {
-  init()    { /* connect SMTP */ }
-  async execute(ctx: any) { /* send email */ }
-  destroy() { /* close connection */ }
-}
-
-// Plugin registry — maps name to instance
-@Injectable()
-export class PluginsService {
-  private pluginRegistry: Record<string, IPlugin> = {
-    'Slack Notifier':  new SlackNotifierPlugin(),
-    'Email Notifier':  new EmailNotifierPlugin(),
-    'Discord Alerts':  new DiscordAlertPlugin(),
-  };
-
-  async toggle(id: string) {
-    const plugin = await this.prisma.plugin.findUnique({ where: { id } });
-    const updated = await this.prisma.plugin.update({
-      where: { id }, data: { enabled: !plugin.enabled }
-    });
-
-    const instance = this.pluginRegistry[plugin.name];
-    if (instance) {
-      if (updated.enabled) instance.init();    // lifecycle: start
-      else                 instance.destroy(); // lifecycle: stop
-    }
-    return updated;
-  }
+// MLOps plugins now available:
+pluginRegistry = {
+  'MLflow Tracker':    new MLflowTrackerPlugin(),
+  'Evidently Monitor': new EvidentiallyPlugin(),
+  'Trivy Scanner':     new TrivyScannerPlugin(),
+  // + original: Slack, Email, Discord, Security, AI Advisor, etc.
 }
 ```
 
 ---
 
-## 7. SOLID Principles
+## 8. SOLID Principles
 
-### S — Single Responsibility Principle
-Every module has exactly one reason to change:
-
-| Module | Single Responsibility |
+### S — Single Responsibility
+| Module | Responsibility |
 |---|---|
-| `AuthModule` | Only handles login, JWT, guards |
-| `PipelinesModule` | Only handles pipeline CRUD |
-| `ExecutionModule` | Only runs pipeline stages |
-| `RollbackModule` | Only handles rollback logic |
-| `NotificationsModule` | Only manages alerts |
-| `MetricsModule` | Only aggregates analytics |
-| `PluginsModule` | Only manages plugin lifecycle |
+| `ExperimentsModule` | Only tracks ML experiment metrics and params |
+| `ModelRegistryModule` | Only manages model version lifecycle (stage promotion, rollback) |
+| `DataValidationModule` | Only runs data quality check suites |
+| `DriftDetectionModule` | Only detects drift and generates alerts |
+| `FeatureStoreModule` | Only catalogs reusable feature definitions |
+| `ExecutionModule` | Only runs pipeline stages via Chain+Factory+Decorator |
 
-### O — Open/Closed Principle
-The execution engine is **open for extension, closed for modification**:
-- Adding a new stage type: create `LintStageExecutor`, register in `StageFactory.executors` map → **engine code unchanged**
-- Adding a new decorator: create `AuditDecorator`, add case in `applyDecorators()` → **engine code unchanged**
-- Adding a new cloud provider: create `DigitalOceanAdapter` + `DOFactory` → **engine code unchanged**
+### O — Open/Closed
+- Add new ML stage executor: create class → register in `StageFactory` map → zero engine changes
+- Add new ML pipeline template: add method in `PipelineDirector` → zero pipeline service changes
+- Add new cloud provider: create `DigitalOceanAdapter + DOFactory` → zero execution engine changes
 
-### L — Liskov Substitution Principle
-Any `IStageExecutor` implementation can replace another without breaking the engine:
+### L — Liskov Substitution
 ```typescript
-// ExecutionService works identically whether executor is:
-const executor: IStageExecutor = StageFactory.create('build');   // BuildStageExecutor
-const executor: IStageExecutor = StageFactory.create('deploy');  // DeployStageExecutor
-// Both substitutable — engine just calls executor.execute()
+// All 14 stage executors are substitutable:
+const executor: IStageExecutor = StageFactory.create('model-training');
+const executor: IStageExecutor = StageFactory.create('canary-deploy');
+// Engine always calls executor.execute() — concrete class irrelevant
 ```
 
-### I — Interface Segregation Principle
-Focused, minimal interfaces:
+### I — Interface Segregation
 ```typescript
-IStageExecutor   { execute(), getName() }          // only execution concern
-ICloudProvider   { deploy(), rollback(), monitor() } // only cloud concern
-IPlugin          { init(), execute(), destroy() }   // only plugin lifecycle
-IStageComponent  { getName(), execute() }           // only composite concern
-ICommand         { execute(), undo?() }             // only command concern
-IPipelineState   { canStart(), canCancel(), ... }   // only state concern
+IStageExecutor   { execute(), getName() }              // execution only
+ICloudProvider   { deploy(), rollback(), monitor() }   // cloud only
+IPlugin          { init(), execute(), destroy() }      // plugin lifecycle only
+IStageComponent  { getName(), execute() }              // composite only
+ICommand         { execute(), undo?() }                // command only
+IPipelineState   { canStart(), canCancel(), ... }      // state only
 ```
-No interface forces implementors to depend on methods they don't use.
 
-### D — Dependency Inversion Principle
-High-level modules depend on abstractions, not concretions:
+### D — Dependency Inversion
 ```typescript
-// ExecutionService depends on IStageExecutor interface, not BuildStageExecutor
+// Execution engine depends on IStageExecutor, never concrete class
 const executor: IStageExecutor = StageFactory.create(stage.type);
-executor.execute(config); // polymorphic — never knows the concrete class
 
-// Cloud providers injected via factory, never directly
+// Cloud provider injected via factory, never directly
 const provider: ICloudProvider = CloudFactoryResolver.resolve(pipeline.provider);
-provider.deploy(config); // works for AWS, Azure, GCP equally
 ```
 
 ---
 
-## 8. Database Schema
+## 9. Platform Modules
+
+### 9.1 CI/CD Pipeline Engine
+
+Full pipeline execution with real-time WebSocket streaming, state machine lifecycle, decorator-wrapped stages, and auto-rollback on failure.
+
+**Stage Types Available:**
+`build` · `test` · `security` · `deploy` · `monitor` · `lint` · `package` · `data-validation` · `feature-engineering` · `model-training` · `model-evaluation` · `model-registration` · `canary-deploy` · `drift-check`
+
+---
+
+### 9.2 Experiment Tracking
+
+MLflow-style experiment tracking with metrics comparison, hyperparameter logging, and visual radar charts.
+
+**Tracked per experiment:**
+- Metrics: AUC-ROC, F1, Precision, Recall, Accuracy, Loss
+- Parameters: learning_rate, max_depth, n_estimators, dropout, etc.
+- Model type: xgboost, lightgbm, random_forest, pytorch
+- Tags: production-candidate, baseline, archived
+- Duration and lineage
+
+**API:** `GET /experiments` · `POST /experiments` · `POST /experiments/compare`
+
+---
+
+### 9.3 Model Registry
+
+Versioned model management with stage-based promotion workflow.
+
+**Stage lifecycle:**
+```
+candidate → staging → production
+                    ↓ (on new promotion)
+                  archived
+```
+
+**Operations:** Promote, rollback, archive
+
+**API:** `GET /model-registry` · `POST /model-registry/:id/promote` · `POST /model-registry/:name/rollback`
+
+---
+
+### 9.4 Data Validation
+
+Great Expectations-style validation suite with 12 automated checks per dataset run.
+
+**Checks performed:**
+- Schema validation (column presence and types)
+- Null value threshold (per-column)
+- Value range enforcement
+- Duplicate row detection
+- Categorical value set validation
+- Distribution shift (KS statistic)
+- Outlier detection
+- Target label balance
+- Foreign key integrity
+- Date range validation
+- String format validation (email, phone)
+- Feature correlation analysis
+
+**API:** `GET /data-validation` · `POST /data-validation/run`
+
+---
+
+### 9.5 Drift Detection & Monitoring
+
+Evidently AI-style drift monitoring with PSI score computation, real-time inference metrics, and auto-retraining triggers.
+
+**Drift types detected:** Data drift · Concept drift · Label drift · Prediction drift
+
+**Inference monitoring metrics:**
+- P50/P99 inference latency
+- Throughput (requests per minute)
+- Error rate
+- Prediction distribution (24h)
+- Per-feature PSI scores
+
+**Alert lifecycle:** `open → acknowledged → resolved`
+
+**API:** `GET /drift-detection` · `POST /drift-detection/check` · `GET /drift-detection/metrics`
+
+---
+
+### 9.6 Feature Store
+
+Feast-inspired feature catalog with entity-grouped feature definitions.
+
+**Feature entities:** customer · transaction · product
+
+**API:** `GET /feature-store` · `PATCH /feature-store/:id/toggle`
+
+---
+
+## 10. Database Schema
 
 ```
 ┌──────────┐     ┌────────────┐     ┌──────────┐
 │   User   │────►│  Pipeline  │────►│  Stage   │
-│──────────│     │────────────│     │──────────│
-│ id (PK)  │     │ id (PK)    │     │ id (PK)  │
-│ email    │     │ name       │     │ name     │
-│ password │     │ description│     │ type     │
-│ role     │     │ provider   │     │ orderIndex│
-│ createdAt│     │ status     │     │ config   │
-└──────────┘     │ userId (FK)│     │decorators│
-                 │ createdAt  │     │pipelineId│
-                 └──────┬─────┘     └──────────┘
+└──────────┘     └──────┬─────┘     └──────────┘
                         │
                         ▼
                  ┌────────────┐
                  │ Execution  │
-                 │────────────│
-                 │ id (PK)    │
-                 │ status     │
-                 │ duration   │
-                 │ logs (JSON)│
-                 │ provider   │
-                 │ forceFail  │
-                 │ failStage  │
-                 │ pipelineId │
                  └────────────┘
 
-┌──────────────┐     ┌──────────────┐
-│    Plugin    │     │ Notification │
-│──────────────│     │──────────────│
-│ id (PK)      │     │ id (PK)      │
-│ name         │     │ title        │
-│ description  │     │ message      │
-│ category     │     │ type         │
-│ enabled      │     │ read         │
-│ config (JSON)│     │ createdAt    │
+┌──────────────┐     ┌──────────────┐     ┌──────────────────┐
+│  Experiment  │     │ ModelVersion │     │DataValidationRun │
+│──────────────│     │──────────────│     │──────────────────│
+│ id           │     │ id           │     │ id               │
+│ name         │     │ name         │     │ datasetName      │
+│ modelType    │     │ version      │     │ status           │
+│ metrics JSON │     │ stage        │     │ rowCount         │
+│ params JSON  │     │ framework    │     │ checksPassed     │
+│ tags JSON    │     │ metrics JSON │     │ checksFailed     │
+│ status       │     │ artifactPath │     │ results JSON     │
+│ duration     │     │ promotedAt   │     └──────────────────┘
+│ pipelineId   │     │ experimentId │
 └──────────────┘     └──────────────┘
+
+┌──────────────┐     ┌──────────────┐
+│  DriftAlert  │     │   Feature    │
+│──────────────│     │──────────────│
+│ id           │     │ id           │
+│ alertType    │     │ name         │
+│ severity     │     │ entity       │
+│ feature      │     │ valueType    │
+│ psiScore     │     │ description  │
+│ threshold    │     │ source       │
+│ modelName    │     │ tags JSON    │
+│ autoRetrain  │     │ enabled      │
+│ status       │     └──────────────┘
+│ resolvedAt   │
+└──────────────┘
 ```
 
 ---
 
-## 9. REST API Reference
+## 11. REST API Reference
 
 Base URL: `http://localhost:4000/api/v1`
 
@@ -1050,143 +799,160 @@ All routes except `/auth/login` require: `Authorization: Bearer <JWT_TOKEN>`
 ### Authentication
 | Method | Route | Description |
 |---|---|---|
-| POST | `/auth/login` | Login → returns JWT token |
-| GET | `/auth/me` | Get current user profile |
-| POST | `/auth/logout` | Logout (client clears token) |
+| POST | `/auth/login` | Login → JWT token |
+| GET | `/auth/me` | Current user profile |
 
-### Pipelines
+### Pipelines & Execution
 | Method | Route | Description |
 |---|---|---|
-| GET | `/pipelines` | List all pipelines for user |
-| GET | `/pipelines/:id` | Get single pipeline with stages |
-| POST | `/pipelines` | Create new pipeline |
-| PATCH | `/pipelines/:id` | Update pipeline and stages |
-| DELETE | `/pipelines/:id` | Delete pipeline |
-| POST | `/pipelines/:id/clone` | Clone pipeline |
-| POST | `/pipelines/template/:name` | Create from template (`node`, `docker`, `fullqa`, `quickdeploy`) |
+| GET | `/pipelines` | List all pipelines |
+| POST | `/pipelines` | Create pipeline |
+| POST | `/pipelines/template/:name` | From template (`node`, `docker`, `fullqa`, `quickdeploy`, `mltraining`, `mldeploy`, `fullmlops`) |
+| POST | `/execution/start/:id` | Run pipeline |
+| POST | `/execution/rollback/:id` | Rollback execution |
+| GET | `/execution/history` | Execution history |
 
-### Execution
+### MLOps — Experiments
 | Method | Route | Description |
 |---|---|---|
-| POST | `/execution/start/:pipelineId` | Start pipeline execution |
-| GET | `/execution/history` | Get all execution history |
-| GET | `/execution/:id` | Get single execution with logs |
-| POST | `/execution/rollback/:executionId` | Trigger rollback |
+| GET | `/experiments` | List all experiments |
+| POST | `/experiments` | Create experiment |
+| POST | `/experiments/compare` | Compare multiple experiments |
 
-### Plugins
+### MLOps — Model Registry
 | Method | Route | Description |
 |---|---|---|
-| GET | `/plugins` | List all plugins |
-| PATCH | `/plugins/:id/toggle` | Enable/disable plugin |
+| GET | `/model-registry` | List all model versions |
+| POST | `/model-registry/:id/promote` | Promote to staging/production/archived |
+| POST | `/model-registry/:name/rollback` | Rollback to previous version |
 
-### Notifications
+### MLOps — Data Validation
 | Method | Route | Description |
 |---|---|---|
-| GET | `/notifications` | Get all notifications |
-| PATCH | `/notifications/:id/read` | Mark single as read |
-| PATCH | `/notifications/all/read` | Mark all as read |
+| GET | `/data-validation` | Validation run history |
+| POST | `/data-validation/run` | Run validation suite on dataset |
 
-### Metrics
+### MLOps — Drift Detection
 | Method | Route | Description |
 |---|---|---|
-| GET | `/metrics/dashboard` | KPI cards + chart data + recent activity |
+| GET | `/drift-detection` | All drift alerts |
+| GET | `/drift-detection/open` | Open alerts |
+| GET | `/drift-detection/metrics` | Inference monitoring metrics |
+| POST | `/drift-detection/check` | Run drift check on a model |
+| POST | `/drift-detection/:id/acknowledge` | Acknowledge alert |
+| POST | `/drift-detection/:id/resolve` | Resolve alert |
+
+### MLOps — Feature Store
+| Method | Route | Description |
+|---|---|---|
+| GET | `/feature-store` | List all features |
+| GET | `/feature-store?entity=customer` | Filter by entity |
+| PATCH | `/feature-store/:id/toggle` | Enable/disable feature |
+
+### System
+| Method | Route | Description |
+|---|---|---|
+| GET | `/metrics/dashboard` | KPI + charts |
+| GET | `/plugins` | Plugin list |
+| PATCH | `/plugins/:id/toggle` | Toggle plugin |
+| GET | `/notifications` | Notifications |
 
 ---
 
-## 10. WebSocket Events
+## 12. WebSocket Events
 
 Connect to: `ws://localhost:4000`
 
-### Server → Client Events
-
 | Event | Payload | Description |
 |---|---|---|
-| `execution:start` | `{ executionId, pipelineId }` | Pipeline execution started |
-| `execution:stage` | `{ executionId, stageName, status, stageIndex }` | Stage status changed |
-| `execution:log` | `{ executionId, time, message, stage }` | New log line |
+| `execution:start` | `{ executionId, pipelineId }` | Pipeline started |
+| `execution:stage` | `{ executionId, stageName, status, stageIndex }` | Stage status |
+| `execution:log` | `{ executionId, time, message, stage }` | Live log line |
 | `execution:success` | `{ executionId, pipelineId }` | All stages passed |
 | `execution:failed` | `{ executionId, failedStage }` | Stage failed |
-| `execution:rollback` | `{ executionId, pipelineId }` | Rollback started |
-| `execution:rollback:complete` | `{ executionId }` | Rollback complete |
+| `execution:rollback` | `{ executionId }` | Rollback triggered |
 
-### Example log payload
-```json
-{
-  "executionId": "abc-123",
-  "time": "14:23:45",
-  "message": "[Build] Build successful",
-  "stage": "Build"
-}
+---
+
+## 13. CI/CD with GitHub Actions
+
+### CI Pipeline (`.github/workflows/ci.yml`)
+
+Triggers on every push and pull request to `main`:
+
+```
+Push / PR
+   ↓
+Backend Lint + Type Check
+   ↓
+Backend Build
+   ↓
+Frontend Lint + Type Check + Build
+   ↓
+Trivy Container Vulnerability Scan
+   ↓
+Integration Smoke Test (Postgres + Migration + Seed + API check)
+```
+
+### CD Pipeline (`.github/workflows/cd.yml`)
+
+Triggers on push to `main` or version tag (`v*.*.*`):
+
+```
+Push to main / tag
+   ↓
+Build + Push Docker Images → GitHub Container Registry
+   ↓
+Deploy to Staging (kubectl apply)
+   ↓
+Staging Smoke Tests
+   ↓ (tags only)
+Canary Deploy to Production (10% traffic)
+   ↓
+Monitor canary metrics
+   ↓
+Promote to 100% OR Emergency Rollback
 ```
 
 ---
 
-## 11. Core Features
+## 14. Kubernetes Deployment
 
-### Feature 1 — JWT Authentication
-- Demo admin pre-seeded: `admin@pipeforge.dev` / `admin123`
-- JWT token stored in `localStorage` via Zustand persisted store
-- All API requests send `Authorization: Bearer <token>` via Axios interceptor
-- Expired/invalid tokens automatically redirect to `/login`
+### Manifests
 
-### Feature 2 — Premium Dashboard
-- **8 KPI Cards:** Total Pipelines, Running, Successful, Failed, Rollbacks, Avg Deploy Time, Active Plugins, Success Rate
-- **Area Chart:** Monthly deployments (success vs failed)
-- **Pie Chart:** Provider distribution (AWS / Azure / GCP)
-- **Bar Chart:** Deployment outcomes by month
-- **Activity Feed:** Latest 6 notifications with timestamps
+| File | Contents |
+|---|---|
+| `namespace.yaml` | `pipeforge` namespace |
+| `backend-deployment.yaml` | Deployment + Service + HPA (2–20 pods, CPU 70%) |
+| `frontend-deployment.yaml` | Deployment + Service |
+| `ingress.yaml` | Nginx Ingress + TLS (cert-manager) |
+| `configmap-secret.yaml` | ConfigMap + Secret template |
+| `helm/Chart.yaml` | Helm chart metadata |
+| `helm/values.yaml` | Configurable replica counts, images, autoscaling |
 
-### Feature 3 — Visual Pipeline Builder
-- Drag-and-drop stage reordering with `@dnd-kit/sortable`
-- Stage library panel: 9 stage types available
-- Per-stage configuration: timeout, retries
-- Per-stage decorator toggles: logging, retry, notification, security, metrics
-- 4 pre-built templates via the PipelineDirector
+### Deploy with Helm
 
-### Feature 4 — Execution Engine
-- Sequential stage execution with real delays (simulates real work)
-- State machine tracks lifecycle: `Idle → Running → Success/Failed → Rollback`
-- Factory creates correct executor per stage type
-- Decorators wrap executors based on user configuration
-- All logs streamed live via WebSocket
-
-### Feature 5 — Failure Simulation
-- **Force Fail** toggle in the execution request body
-- Specify which stage to fail: Build, Test, Security, Deploy, Monitor
-- Stage intentionally returns `success: false`
-- Failure triggers automatic rollback sequence
-
-### Feature 6 — Rollback Engine
-```
-Failure detected
-  → Pipeline status → 'rollback'
-  → WebSocket event emitted
-  → Simulated rollback steps logged
-  → Pipeline status → 'idle'
-  → Success notification created
+```bash
+# Add chart and deploy
+helm upgrade --install pipeforge ./kubernetes/helm \
+  --namespace pipeforge \
+  --create-namespace \
+  --set image.tag=v1.2.0 \
+  --set backend.resources.limits.memory=512Mi
 ```
 
-### Feature 7 — Live Log Viewer
-- Execution page connects to Socket.IO on mount
-- `execution:log` events appended to log array in real time
-- Terminal-style monospace display with color coding (green=success, red=error, orange=rollback)
-- Stage progress bar shows each stage's current status
-- Auto-scroll to latest log line
+### Autoscaling
 
-### Feature 8 — Plugin Marketplace
-- 8 plugins across 5 categories: notification, security, analytics, ai, deployment
-- Toggle switches enable/disable plugins
-- Plugin lifecycle: `init()` on enable, `destroy()` on disable
-- Visual indicators: category icons, active/inactive badges
-
-### Feature 9 — Dark / Light Theme
-- `next-themes` manages theme preference
-- Toggle button in every Navbar
-- Persists across browser sessions
+```yaml
+minReplicas: 2
+maxReplicas: 20
+targetCPUUtilizationPercentage: 70
+# Scales from 2 pods → 20 pods under load
+```
 
 ---
 
-## 12. Setup & Installation
+## 15. Setup & Installation
 
 ### Prerequisites
 - Node.js v22+
@@ -1199,27 +965,25 @@ npm install -g @nestjs/cli
 ```
 
 ### Clone and install
-
 ```bash
-# 1. Install backend dependencies
+# Install backend dependencies
 cd backend
 npm install
 
-# 2. Install frontend dependencies
+# Install frontend dependencies
 cd ../frontend
 npm install
 ```
 
 ---
 
-## 13. How to Run
+## 16. How to Run
 
 ### Step 1 — Start PostgreSQL (Docker)
 ```bash
-# From project root
 docker compose up -d
 ```
-> PostgreSQL runs on **port 5433** (5432 is reserved for local PostgreSQL)
+> PostgreSQL runs on **port 5433**
 
 ### Step 2 — Run database migration + seed
 ```bash
@@ -1227,20 +991,21 @@ cd backend
 npx prisma migrate dev --name init
 npx prisma db seed
 ```
+> Seed includes: admin user, pipelines (CI/CD + ML), 5 experiments, model registry, drift alerts, feature store, data validation runs
 
 ### Step 3 — Start Backend
 ```bash
 cd backend
 npm run start:dev
 ```
-> API available at: `http://localhost:4000`
+> API: `http://localhost:4000`
 
 ### Step 4 — Start Frontend
 ```bash
 cd frontend
 npm run dev
 ```
-> App available at: `http://localhost:3000`
+> App: `http://localhost:3000`
 
 ### Step 5 — Login
 ```
@@ -1269,23 +1034,23 @@ NEXT_PUBLIC_WS_URL=http://localhost:4000
 
 ---
 
-## Design Pattern Summary Table
+## Design Pattern Summary
 
-| Pattern | Category | File | Role in PipeForge |
+| Pattern | Category | File | Role |
 |---|---|---|---|
-| **Builder** | Creational | `pipelines/builders/pipeline.builder.ts` | Constructs pipelines step-by-step via fluent API |
-| **Director** | Creational | `pipelines/builders/pipeline.director.ts` | Encodes reusable pipeline construction sequences |
-| **Factory Method** | Creational | `execution/factories/stage.factory.ts` | Creates correct stage executor by type string |
+| **Builder** | Creational | `pipelines/builders/pipeline.builder.ts` | Fluent API for CI/CD and ML pipelines |
+| **Director** | Creational | `pipelines/builders/pipeline.director.ts` | Templates: node, docker, fullqa, mltraining, mldeploy, fullmlops |
+| **Factory Method** | Creational | `execution/factories/stage.factory.ts` | Creates 14 stage executors by type string |
 | **Abstract Factory** | Creational | `providers/factories/cloud.factory.ts` | Creates cloud provider families (AWS/Azure/GCP) |
-| **Adapter** | Structural | `providers/adapters/cloud.adapter.ts` | Normalizes incompatible cloud provider APIs |
-| **Decorator** | Structural | `execution/decorators/stage.decorators.ts` | Adds logging/retry/metrics to stages dynamically |
-| **Composite** | Structural | `pipelines/composite/stage.composite.ts` | Groups stages into tree structures |
-| **Chain of Responsibility** | Behavioral | `execution/chain/execution.chain.ts` | Passes execution through ordered stage handlers |
-| **Command** | Behavioral | `execution/commands/execution.commands.ts` | Encapsulates execute/rollback as undoable objects |
-| **State** | Behavioral | `execution/states/pipeline.state.ts` | Models pipeline lifecycle as distinct state objects |
-| **Observer** | Behavioral | `websocket/execution.gateway.ts` | Decouples engine from WebSocket/notifications |
-| **Plugin** | Architectural | `plugins/plugins.service.ts` | Dynamic extension without modifying core |
+| **Adapter** | Structural | `providers/adapters/cloud.adapter.ts` | Normalizes AWS/Azure/GCP APIs |
+| **Decorator** | Structural | `execution/decorators/stage.decorators.ts` | Stacks logging/retry/metrics/notification |
+| **Composite** | Structural | `pipelines/composite/stage.composite.ts` | Groups stages as tree structures |
+| **Chain of Responsibility** | Behavioral | `execution/chain/execution.chain.ts` | Sequential stage execution with fail-fast |
+| **Command** | Behavioral | `execution/commands/execution.commands.ts` | Undoable execute/rollback operations |
+| **State** | Behavioral | `execution/states/pipeline.state.ts` | Idle → Running → Success/Failed → Rollback |
+| **Observer** | Behavioral | `websocket/execution.gateway.ts` | Decouples engine from WebSocket/notifications/drift |
+| **Plugin** | Architectural | `plugins/plugins.service.ts` | Dynamic MLflow, Evidently, Trivy extensions |
 
 ---
 
-*PipeForge — Built with enterprise architecture patterns for Software Design & Architecture coursework.*
+*PipeForge — Enterprise MLOps Platform. Built with production-grade design patterns, automated CI/CD, and a complete ML lifecycle from data validation to drift-triggered retraining.*
